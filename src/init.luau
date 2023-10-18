@@ -1,252 +1,74 @@
 local Types = require(script.Types)
 
-export type AnyIter = Types.AnyIter
+local From = require(script.Producers.From)
+local Range = require(script.Producers.Range)
+local Repeat = require(script.Producers.Repeat)
+
 export type Iter<K, V> = Types.Iter<K, V>
-
-local Map = require(script.Map)
-local Filter = require(script.Filter)
-local Fold = require(script.Fold)
-
-local BaseIter = {}
-BaseIter.__index = BaseIter
-
-function BaseIter:__iter()
-    return function()
-        return self:Next()
-    end
-end
-
-function BaseIter.new(isMut: boolean): AnyIter
-    local self = setmetatable({}, BaseIter)
-
-    self._isMut = isMut
-    self._isConsumed = false
-
-    return self
-end
-
-function BaseIter:_extend(): AnyIter
-    self.isConsumed = true
-    return BaseIter.new(self._isMut)
-end
-
-function BaseIter:_assertNotConsumed()
-    assert(not self._isConsumed, "Cannot use an iter after it has been consumed")
-end
-
-function BaseIter:_assertMut()
-    assert(self._isMut, "Cannot mutate a non-mutable iter")
-end
-
-function BaseIter:Next(): (any, any)
-    error("This iter does not implement Next. Report this to the maintainers of iter")
-end
-
-function BaseIter:Nth(n: number): (any, any)
-    assert(n >= 1, "n must be >= 1")
-    self:_assertNotConsumed()
-    self:AdvanceBy(n - 1)
-    return self:Next()
-end
-
-function BaseIter:Last(): (any, any)
-    local lastKey, lastValue = nil, nil
-
-    for key, value in self do
-        lastKey, lastValue = key, value
-    end
-
-    return lastKey, lastValue
-end
-
-function BaseIter:Find(f: (any, any) -> boolean): (any, any)
-    self:_assertNotConsumed()
-
-    for key, value in self do
-        if f(key, value) then
-            return key, value
-        end
-    end
-
-    return nil
-end
-
-function BaseIter:AdvanceBy(n: number): number
-    self:_assertNotConsumed()
-
-    for i = 1, n do
-        if self:Next() == nil then
-            return i - 1
-        end
-    end
-
-    return n
-end
-
-function BaseIter:Map(f: (any, any) -> any): AnyIter
-    self:_assertNotConsumed()
-    return Map(self, f)
-end
-
-function BaseIter:Filter(f: (any, any) -> boolean): Iter<any, any>
-    self:_assertNotConsumed()
-    return Filter(self, f)
-end
-
-function BaseIter:Fold(init: any, f: (any, any, any) -> any): any
-    self:_assertNotConsumed()
-    return Fold(self, init, f)
-end
-
-function BaseIter:Reduce(f: (any, any, any) -> any): any
-    return self:Fold(self:Next(), f)
-end
-
-function BaseIter:Count(): number
-    return self:Fold(0, function(acc)
-        return acc + 1
-    end)
-end
-
-function BaseIter:Sum(): number
-    return self:Reduce(function(_, value, acc)
-        return acc + value
-    end)
-end
-
-function BaseIter:Min(): number
-    return self:Reduce(function(_, value, acc)
-        return math.min(acc, value)
-    end)
-end
-
-function BaseIter:Max(): number
-    return self:Reduce(function(_, value, acc)
-        return math.max(acc, value)
-    end)
-end
-
-function BaseIter:Collect(): { [any]: any }
-    local tbl = {}
-
-    for key, value in self do
-        tbl[key] = value
-    end
-
-    return tbl
-end
-
-function BaseIter:Take(n: number): AnyIter
-    local i = 0
-
-    return self:Filter(function()
-        i = i + 1
-        return i <= n
-    end)
-end
-
-function BaseIter:All(f: (any, any) -> boolean): boolean
-    for key, value in self do
-        if not f(key, value) then
-            return false
-        end
-    end
-
-    return true
-end
-
-function BaseIter:Any(f: (any, any) -> boolean): boolean
-    for key, value in self do
-        if f(key, value) then
-            return true
-        end
-    end
-
-    return false
-end
-
-function BaseIter:Keys(): AnyIter
-    return self:Map(function(key, _value)
-        return key
-    end)
-end
-
-function BaseIter:Values(): AnyIter
-    return self:Map(function(_key, value)
-        return value
-    end)
-end
-
-function BaseIter:Inspect(f: (any, any) -> any): AnyIter
-    return self:Map(function(key, value)
-        f(key, value)
-        return value
-    end)
-end
-
-function BaseIter:ForEach(f: (any, any) -> any): ()
-    for key, value in self do
-        f(key, value)
-    end
-end
+export type Iterable<K, V> = Types.Iterable<K, V>
 
 local Iter = {}
 
-function Iter.range(from: number, to: number?, step: number?)
-    local base = BaseIter.new(false)
+-- Metatable Injection
+local BaseIter = require(script.BaseIter)
 
-    -- If no step is provided, default to 1
-    step = step or 1
-
-    -- If no to is provided, default to math.huge
-    to = to or math.huge
-
-    local nextIndex = 1
-    local nextValue = from
-
-    function base:Next()
-        if nextValue == nil then
-            return nil
-        end
-
-        if nextValue > to then
-            return nil
-        end
-
-        -- Get the result key and value
-        local resultKey, resultValue = nextIndex, nextValue
-
-        -- Update the next index and value
-        nextIndex = nextIndex + 1
-        nextValue = nextValue + step
-
-        return resultKey, resultValue
-    end
+for _, module in script.Producers:GetChildren() do
+    setmetatable(require(module), BaseIter)
 end
 
-function Iter.from<K, V>(tab: {[K]: V}): Iter<K, V>
-    if tab == Iter then
-        error("You have attempted to iterate over the iter library itself. Did you accidentally use `Iter:from(...)` instead of `Iter.from(...)`?")
-    end
+for _, module in script.Adapters:GetChildren() do
+    setmetatable(require(module), BaseIter)
+end
 
-    local base = BaseIter.new(false)
-    local nextKey = next(tab)
+-- Producers
+function Iter.From<K, V>(tab: Types.Tab<K, V>): Iter<K, V>
+    return From.new(tab)
+end
 
-    function base:Next()
-        if nextKey == nil then
-            return nil
-        end
+function Iter.Range(start: number, stop: number, step: number?): Iter<number, number>
+    return Range.new(start, stop, step)
+end
 
-        -- Get the result key and value
-        local resultKey, resultValue = nextKey, tab[nextKey]
+function Iter.Empty<K, V>(): Iter<K, V>
+    return From.new({})
+end
 
-        -- Get the next key for the next iteration
-        nextKey = next(tab, nextKey)
+function Iter.Repeat<K, V>(value: V): Iter<K, V>
+    return Repeat.new(value)
+end
 
-        return resultKey, resultValue
-    end
+-- Consumers
+function Iter.Find<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): (K?, V)
+    return iter:_checkConsume():_find(f)
+end
 
-    return base :: Iter<K, V>
+function Iter.Fold<K, V, A>(iter: Iter<K, V>, init: A, f: Types.Folding<K, V, A>): A
+    return iter:_tryConsume():_fold(init, f)
+end
+
+function Iter.Reduce<K, V, A>(iter: Iter<K, V>, f: Types.Reduction<K, V, A>): A
+    return iter:_tryConsume():_reduce(f)
+end
+
+function Iter.AdvanceBy<K, V>(iter: Iter<K, V>, n: number): number
+    return iter:_checkConsume():_advanceBy(n)
+end
+
+-- Adapters
+function Iter.Map<K1, K2, V1, V2>(iter: Iter<K1, V1>, f: Types.Mapping<K1, K2, V1, V2>): Iter<K2, V2>
+    return iter:_tryConsume():_map(f)
+end
+
+function Iter.Skip<K, V>(iter: Iter<K, V>, n: number): Iter<K, V>
+    return iter:_tryConsume():_skip(n)
+end
+
+function Iter.Take<K, V>(iter: Iter<K, V>, n: number): Iter<K, V>
+    return iter:_tryConsume():_take(n)
+end
+
+function Iter.Filter<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): Iter<K, V>
+    return iter:_tryConsume():_filter(f)
 end
 
 return Iter

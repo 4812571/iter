@@ -16,6 +16,7 @@ type AnyIterNoMeta = {
     _any: (AnyIter, Predicate<any, any>) -> boolean,
     _all: (AnyIter, Predicate<any, any>) -> boolean,
     _join: (AnyIter, string) -> string,
+    _count: (AnyIter) -> number,
 
     -- Adapters
     _map: <K2, V2>(AnyIter, Mapping<any, K2, any, V2>) -> AnyIter,
@@ -37,6 +38,7 @@ type IterNoMeta<K, V> = {
     _any: (Iter<K, V>, Predicate<K, V>) -> boolean,
     _all: (Iter<K, V>, Predicate<K, V>) -> boolean,
     _join: (Iter<K, V>, string) -> string,
+    _count: (Iter<K, V>) -> number,
 
     -- Adapters
     _map: <K2, V2>(Iter<K, V>, Mapping<K, K2, V, V2>) -> AnyIter,

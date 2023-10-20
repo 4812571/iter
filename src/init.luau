@@ -39,7 +39,7 @@ end
 
 -- Consumers
 function Iter.Find<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): (K?, V)
-    return iter:_checkConsume():_find(f)
+    return iter:_tryConsume():_find(f)
 end
 
 function Iter.Fold<K, V, A>(iter: Iter<K, V>, init: A, f: Types.Folding<K, V, A>): A
@@ -72,15 +72,19 @@ function Iter.Filter<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): Iter<K, 
 end
 
 function Iter.Any<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): boolean
-    return iter:_checkConsume():_any(f)
+    return iter:_tryConsume():_any(f)
 end
 
 function Iter.All<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): boolean
-    return iter:_checkConsume():_all(f)
+    return iter:_tryConsume():_all(f)
 end
 
 function Iter.Join<K, V>(iter: Iter<K, V>, sep: string): string
-    return iter:_checkConsume():_join(sep)
+    return iter:_tryConsume():_join(sep)
+end
+
+function Iter.Count<K, V>(iter: Iter<K, V>): number
+    return iter:_tryConsume():_count()
 end
 
 return Iter

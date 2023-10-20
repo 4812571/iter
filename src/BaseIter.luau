@@ -5,6 +5,7 @@ local Reduce = require(script.Parent.Consumers.Reduce)
 local AdvanceBy = require(script.Parent.Consumers.AdvanceBy)
 local Any = require(script.Parent.Consumers.Any)
 local All = require(script.Parent.Consumers.All)
+local Join = require(script.Parent.Consumers.Join)
 
 -- Adapters
 local Map = require(script.Parent.Adapters.Map)
@@ -81,6 +82,10 @@ end
 
 function BaseIter:_all(f)
     return All(self, f)
+end
+
+function BaseIter:_join(sep)
+    return Join(self, sep)
 end
 
 return BaseIter

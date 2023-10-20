@@ -13,7 +13,9 @@ type AnyIterNoMeta = {
     _fold: <A>(AnyIter, A, Folding<any, any, A>) -> A,
     _reduce: <A>(AnyIter, Reduction<any, any, A>) -> A,
     _advanceBy: (AnyIter, number) -> number,
-    
+    _any: (AnyIter, Predicate<any, any>) -> boolean,
+    _all: (AnyIter, Predicate<any, any>) -> boolean,
+
     -- Adapters
     _map: <K2, V2>(AnyIter, Mapping<any, K2, any, V2>) -> AnyIter,
     _skip: (AnyIter, number) -> AnyIter,
@@ -31,6 +33,8 @@ type IterNoMeta<K, V> = {
     _fold: <A>(Iter<K, V>, A, Folding<K, V, A>) -> A,
     _reduce: <A>(Iter<K, V>, Reduction<K, V, A>) -> A,
     _advanceBy: (Iter<K, V>, number) -> number,
+    _any: (Iter<K, V>, Predicate<K, V>) -> boolean,
+    _all: (Iter<K, V>, Predicate<K, V>) -> boolean,
 
     -- Adapters
     _map: <K2, V2>(Iter<K, V>, Mapping<K, K2, V, V2>) -> AnyIter,

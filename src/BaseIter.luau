@@ -3,6 +3,8 @@ local Find = require(script.Parent.Consumers.Find)
 local Fold = require(script.Parent.Consumers.Fold)
 local Reduce = require(script.Parent.Consumers.Reduce)
 local AdvanceBy = require(script.Parent.Consumers.AdvanceBy)
+local Any = require(script.Parent.Consumers.Any)
+local All = require(script.Parent.Consumers.All)
 
 -- Adapters
 local Map = require(script.Parent.Adapters.Map)
@@ -54,6 +56,8 @@ function BaseIter:_advanceBy(n)
     return AdvanceBy(self, n)
 end
 
+
+
 -- Adapters
 function BaseIter:_map(f)
     return Map.new(self, f)
@@ -69,6 +73,14 @@ end
 
 function BaseIter:_filter(f)
     return Filter.new(self, f)
+end
+
+function BaseIter:_any(f)
+    return Any(self, f)
+end
+
+function BaseIter:_all(f)
+    return All(self, f)
 end
 
 return BaseIter

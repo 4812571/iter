@@ -87,4 +87,8 @@ function Iter.Count<K, V>(iter: Iter<K, V>): number
     return iter:_tryConsume():_count()
 end
 
+function Iter.Sum<K, V>(iter: Iter<K, V>): number
+    return iter:_tryConsume():_sum()
+end
+
 return Iter

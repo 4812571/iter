@@ -7,6 +7,7 @@ local Any = require(script.Parent.Consumers.Any)
 local All = require(script.Parent.Consumers.All)
 local Join = require(script.Parent.Consumers.Join)
 local Count = require(script.Parent.Consumers.Count)
+local Sum = require(script.Parent.Consumers.Sum)
 
 -- Adapters
 local Map = require(script.Parent.Adapters.Map)
@@ -91,6 +92,10 @@ end
 
 function BaseIter:_count()
     return Count(self)
+end
+
+function BaseIter:_sum()
+    return Sum(self)
 end
 
 return BaseIter

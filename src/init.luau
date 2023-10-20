@@ -71,4 +71,12 @@ function Iter.Filter<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): Iter<K, 
     return iter:_tryConsume():_filter(f)
 end
 
+function Iter.Any<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): boolean
+    return iter:_checkConsume():_any(f)
+end
+
+function Iter.All<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): boolean
+    return iter:_checkConsume():_all(f)
+end
+
 return Iter

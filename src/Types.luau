@@ -8,11 +8,13 @@ type AnyIterNoMeta = {
     _checkConsume: (AnyIter) -> AnyIter,
     _tryConsume: (AnyIter) -> AnyIter,
 
+    -- Methods
+    _advanceBy: (AnyIter, number) -> number,
+
     -- Consumers
     _find: (AnyIter, Predicate<any, any>) -> (any?, any),
     _fold: <A>(AnyIter, A, Folding<any, any, A>) -> A,
     _reduce: <A>(AnyIter, Reduction<any, any, A>) -> A,
-    _advanceBy: (AnyIter, number) -> number,
     _any: (AnyIter, Predicate<any, any>) -> boolean,
     _all: (AnyIter, Predicate<any, any>) -> boolean,
     _join: (AnyIter, string) -> string,
@@ -24,6 +26,8 @@ type AnyIterNoMeta = {
     _skip: (AnyIter, number) -> AnyIter,
     _take: (AnyIter, number) -> AnyIter,
     _filter: (AnyIter, Predicate<any, any>) -> AnyIter,
+    _keys: (AnyIter) -> AnyIter,
+    _values: (AnyIter) -> AnyIter,
 }
 
 type IterNoMeta<K, V> = {
@@ -31,11 +35,13 @@ type IterNoMeta<K, V> = {
     _checkConsume: (Iter<K, V>) -> Iter<K, V>,
     _tryConsume: (Iter<K, V>) -> Iter<K, V>,
 
-    -- -- Consumers
+    -- Methods
+    _advanceBy: (Iter<K, V>, number) -> number,
+
+    -- Consumers
     _find: (Iter<K, V>, Predicate<K, V>) -> (K?, V),
     _fold: <A>(Iter<K, V>, A, Folding<K, V, A>) -> A,
     _reduce: <A>(Iter<K, V>, Reduction<K, V, A>) -> A,
-    _advanceBy: (Iter<K, V>, number) -> number,
     _any: (Iter<K, V>, Predicate<K, V>) -> boolean,
     _all: (Iter<K, V>, Predicate<K, V>) -> boolean,
     _join: (Iter<K, V>, string) -> string,
@@ -47,6 +53,8 @@ type IterNoMeta<K, V> = {
     _skip: (Iter<K, V>, number) -> Iter<K, V>,
     _take: (Iter<K, V>, number) -> Iter<K, V>,
     _filter: (Iter<K, V>, Predicate<K, V>) -> Iter<K, V>,
+    _keys: (Iter<K, V>) -> Iter<K, V>,
+    _values: (Iter<K, V>) -> Iter<K, V>,
 }
 
 type IterableMeta<K, V> = {

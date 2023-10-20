@@ -37,6 +37,11 @@ function Iter.Repeat<K, V>(value: V): Iter<K, V>
     return Repeat.new(value)
 end
 
+-- Methods
+function Iter.AdvanceBy<K, V>(iter: Iter<K, V>, n: number): number
+    return iter:_checkConsume():_advanceBy(n)
+end
+
 -- Consumers
 function Iter.Find<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): (K?, V)
     return iter:_tryConsume():_find(f)
@@ -48,27 +53,6 @@ end
 
 function Iter.Reduce<K, V, A>(iter: Iter<K, V>, f: Types.Reduction<K, V, A>): A
     return iter:_tryConsume():_reduce(f)
-end
-
-function Iter.AdvanceBy<K, V>(iter: Iter<K, V>, n: number): number
-    return iter:_checkConsume():_advanceBy(n)
-end
-
--- Adapters
-function Iter.Map<K1, K2, V1, V2>(iter: Iter<K1, V1>, f: Types.Mapping<K1, K2, V1, V2>): Iter<K2, V2>
-    return iter:_tryConsume():_map(f)
-end
-
-function Iter.Skip<K, V>(iter: Iter<K, V>, n: number): Iter<K, V>
-    return iter:_tryConsume():_skip(n)
-end
-
-function Iter.Take<K, V>(iter: Iter<K, V>, n: number): Iter<K, V>
-    return iter:_tryConsume():_take(n)
-end
-
-function Iter.Filter<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): Iter<K, V>
-    return iter:_tryConsume():_filter(f)
 end
 
 function Iter.Any<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): boolean
@@ -89,6 +73,31 @@ end
 
 function Iter.Sum<K, V>(iter: Iter<K, V>): number
     return iter:_tryConsume():_sum()
+end
+
+-- Adapters
+function Iter.Map<K1, K2, V1, V2>(iter: Iter<K1, V1>, f: Types.Mapping<K1, K2, V1, V2>): Iter<K2, V2>
+    return iter:_tryConsume():_map(f)
+end
+
+function Iter.Skip<K, V>(iter: Iter<K, V>, n: number): Iter<K, V>
+    return iter:_tryConsume():_skip(n)
+end
+
+function Iter.Take<K, V>(iter: Iter<K, V>, n: number): Iter<K, V>
+    return iter:_tryConsume():_take(n)
+end
+
+function Iter.Filter<K, V>(iter: Iter<K, V>, f: Types.Predicate<K, V>): Iter<K, V>
+    return iter:_tryConsume():_filter(f)
+end
+
+function Iter.Keys<K, V>(iter: Iter<K, V>): Iter<K, V>
+    return iter:_tryConsume():_keys()
+end
+
+function Iter.Values<K, V>(iter: Iter<K, V>): Iter<K, V>
+    return iter:_tryConsume():_values()
 end
 
 return Iter

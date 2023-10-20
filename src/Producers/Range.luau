@@ -40,4 +40,12 @@ function Range.new(from: number, to: number, step: number?)
     return self
 end
 
+function Range:__iter()
+    return self._loop
+end
+
+function Range:_next()
+    return self._loop()
+end
+
 return Range

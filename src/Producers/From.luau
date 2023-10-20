@@ -14,6 +14,9 @@ function From.new(iter)
         end
     end)
 
+    -- Initialize the coroutine
+    self._loop(iter)
+
     return self
 end
 

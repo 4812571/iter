@@ -3,6 +3,7 @@ local Types = require(script.Types)
 local From = require(script.Producers.From)
 local Range = require(script.Producers.Range)
 local Repeat = require(script.Producers.Repeat)
+local Zip = require(script.Adapters.Zip)
 
 export type Iter<K, V> = Types.Iter<K, V>
 export type Iterable<K, V> = Types.Iterable<K, V>
@@ -98,6 +99,10 @@ end
 
 function Iter.Values<K, V>(iter: Iter<K, V>): Iter<K, V>
     return iter:_tryConsume():_values()
+end
+
+function Iter.Zip<K, V>(...: Iter<K, V>): Iter<{K}, {V}>
+    return Zip.new(...)
 end
 
 return Iter

@@ -16,6 +16,8 @@ function Skip.new(iter, n)
             coroutine.yield(k, v)
         end
     end)
+
+    return self
 end
 
 function Skip:__iter()

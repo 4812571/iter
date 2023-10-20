@@ -19,6 +19,8 @@ function Take.new(iter, n)
             coroutine.yield(k, v)
         end
     end)
+
+    return self
 end
 
 function Take:__iter()

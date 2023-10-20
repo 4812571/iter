@@ -36,6 +36,8 @@ function Range.new(from: number, to: number, step: number?)
 
     -- Initialize the coroutine
     self._loop(from, to, if step == nil then 1 else step)
+
+    return self
 end
 
 return Range

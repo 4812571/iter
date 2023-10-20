@@ -16,6 +16,8 @@ function Map.new(iter, f)
 
     -- Initialize the coroutine
     self._loop(iter, f)
+
+    return self
 end
 
 function Map:__iter()

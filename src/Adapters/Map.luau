@@ -28,7 +28,7 @@ end
 
 function Map:__iter()
     -- 'self' will be passed into self._next iteratively
-    return self._loop, self
+    return self._next, self
 end
 
 return Map

@@ -1,11 +1,14 @@
-local function Join(iter, sep)
-    local tab = {}
+local function Join(iter, separator)
+    -- Allocate a buffer to store the strings
+    local buffer = {}
 
-    for _, v in iter do
-        table.insert(tab, v)
+    -- Collect the strings into the buffer
+    for _, value in iter do
+        table.insert(buffer, value)
     end
 
-    return table.concat(tab, sep)
+    -- Concatenate the strings in the buffer
+    return table.concat(buffer, separator)
 end
 
 return Join

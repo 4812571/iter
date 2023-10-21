@@ -4,28 +4,22 @@ Skip.__index = Skip
 function Skip.new(iter, n)
     local self = setmetatable({}, Skip)
 
-    self._loop = coroutine.wrap(function(iter, n)
-        -- Yield a singular time to allow the coroutine to be initialized
-        coroutine.yield()
+    self._iter = iter
 
-        -- Advance the iterator n times
-        iter:_advanceBy(n)
-
-        -- Yield the remaining values
-        for k, v in iter do
-            coroutine.yield(k, v)
-        end
-    end)
+    -- Advance the provided iterator n times
+    iter:_advanceBy(n)
 
     return self
 end
 
-function Skip:__iter()
-    return self._loop
+function Skip:_next()
+    -- The iterator has already been advanced. The values can be returned from the iterator verbatim.
+    return self._iter:_next()
 end
 
-function Skip:_next()
-    return self._loop()
+function Skip:__iter()
+    -- 'self' will be passed into self._next iteratively
+    return self._loop, self 
 end
 
 return Skip

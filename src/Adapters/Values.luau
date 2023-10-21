@@ -1,25 +1,34 @@
-local Values = {}
-Values.__index = Values
+local Keys = {}
+Keys.__index = Keys
 
-function Values.new(iter)
-    local self = setmetatable({}, Values)
+function Keys.new(iter)
+    local self = setmetatable({}, Keys)
 
-    self._loop = coroutine.wrap(function(iter)
-        -- Yield a singular time to allow the coroutine to be initialized
-        coroutine.yield()
-
-        local i = 1
-
-        for k, v in iter do
-            coroutine.yield(i, v)
-            i += 1
-        end
-    end)
-
-    -- Initialize the coroutine
-    self._loop(iter)
+    self._iter = iter
+    self._prevIndex = 0
 
     return self
 end
 
-return Values
+function Keys:_next()
+    -- Retrieve the next key & value from iterator
+    local key, value = self._iter:_next()
+
+    -- If the key is nil, the iteration is over
+    if key == nil then
+        return nil
+    end
+
+    -- Increment the index
+    self._prevIndex += 1
+
+    -- Return the index and value, so that the iterator appears to be an array of values
+    return self._prevIndex, value
+end
+
+function Keys:__iter()
+    -- 'self' will be passed into self._next iteratively
+    return self._next, self
+end
+
+return Keys

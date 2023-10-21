@@ -1,31 +1,34 @@
 local From = {}
 From.__index = From
 
-function From.new(iter)
+function From.new(tab)
     local self = setmetatable({}, From)
 
-    self._loop = coroutine.wrap(function(iter)
-        -- Yield a singular time to allow the coroutine to be initialized
-        coroutine.yield()
-
-        -- Yield the values verbatim
-        for k, v in iter do
-            coroutine.yield(k, v)
-        end
-    end)
-
-    -- Initialize the coroutine
-    self._loop(iter)
+    self._tab = tab
+    self._previousKey = nil
 
     return self
 end
 
-function From:__iter()
-    return self._loop
+function From:_next()
+    -- Get the next key & value from the table
+    local key, value = next(self._tab, self._previousKey)
+
+    -- If the key is nil, the iteration is over
+    if key == nil then
+        return nil
+    end
+
+    -- Update the previous key
+    self._previousKey = key
+
+    -- Return the key & value
+    return key, value
 end
 
-function From:_next()
-    return self._loop()
+function From:__iter()
+    -- 'self' will be passed into self._next iteratively
+    return self._next, self
 end
 
 return From

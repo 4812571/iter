@@ -1,7 +1,8 @@
 local function Count(iter)
     local count = 0
 
-    for _, _ in iter do
+    -- Count the number of iterations
+    for _ in iter do
         count += 1
     end
 

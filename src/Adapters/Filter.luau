@@ -4,27 +4,19 @@ Filter.__index = Filter
 function Filter.new(iter, f)
     local self = setmetatable({}, Filter)
 
-    self._loop = coroutine.wrap(function(iter, f)
-        -- Yield a singular time to allow the coroutine to be initialized
-        coroutine.yield()
+    self._iter = iter
+    self._f = f
 
-        for k, v in iter do
-            if f(v, k) then
-                coroutine.yield(k, v)
-            end
-        end
-    end)
-
-    -- Initialize the coroutine
-    self._loop(iter, f)
-end
-
-function Filter:__iter()
-    return self._loop
+    return self
 end
 
 function Filter:_next()
-    return self._loop()
+    return self._iter:_find(self._f)
+end
+
+function Filter:__iter()
+    -- 'self' will be passed into self._next iteratively
+    return self._next, self
 end
 
 return Filter

@@ -3,32 +3,29 @@ Take.__index = Take
 
 function Take.new(iter, n)
     local self = setmetatable({}, Take)
+    
+    self._iter = iter
+    
+    -- Advance the provided iterator n times
+    iter:_advanceBy(n)
 
-    self._loop = coroutine.wrap(function(iter, n)
-        -- Yield a singular time to allow the coroutine to be initialized
-        coroutine.yield()
-
-        local i = 0
-
-        for k, v in iter do
-            if i == n then
-                break
-            end
-
-            i += 1
-            coroutine.yield(k, v)
-        end
-    end)
+    -- Store the number of remaining iterations
+    self._remaining = n
 
     return self
 end
 
-function Take:__iter()
-    return self._loop
-end
-
 function Take:_next()
-    return self._loop()
+    -- If there are no remaining iterations, return nil
+    if self._remaining == 0 then
+        return nil
+    end
+
+    -- Decrement the remaining iterations
+    self._remaining -= 1
+
+    -- Return the next value from the iterator
+    return self._iter:_next()
 end
 
 return Take

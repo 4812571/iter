@@ -55,8 +55,8 @@ function BaseIter:_find(f)
     return Find(self, f)
 end
 
-function BaseIter:_fold(f, init)
-    return Fold(self, f, init)
+function BaseIter:_fold(init, f)
+    return Fold(self, init, f)
 end
 
 function BaseIter:_reduce(f)

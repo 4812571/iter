@@ -1,15 +1,13 @@
 local function AdvanceBy(iter, n)
-    local i = 0
+    -- Call next n times
+    for i = 1, n do
+        local key = iter._next()
 
-    for _, _ in iter do
-        i += 1
-
-        if i == n then
-            break
+        -- If the iterator is exhausted, the iteration can be stopped early
+        if key == nil then
+            return
         end
     end
-
-    return i
 end
 
 return AdvanceBy

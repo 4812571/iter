@@ -24,28 +24,32 @@ function Range.new(from: number, to: number, step: number?)
         error("Range step cannot be zero")
     end
 
-    self._loop = coroutine.wrap(function(from: number, to: number, step: number)
-        -- Yield a singular time to allow the coroutine to be initialized
-        coroutine.yield()
+    self._from = from
+    self._to = to
+    self._step = step or 1
 
-        -- Yield the values verbatim
-        for i = from, to, step or 1 do
-            coroutine.yield(i, i)
-        end
-    end)
-
-    -- Initialize the coroutine
-    self._loop(from, to, if step == nil then 1 else step)
-
-    return self
-end
-
-function Range:__iter()
-    return self._loop
+    self._nextValue = from
 end
 
 function Range:_next()
-    return self._loop()
+    -- If the next value is past the end, return nil
+    if (self._nextValue > self._to) then
+        return nil
+    end
+
+    -- Store the next value so that it can be returned
+    local nextValue = self._nextValue
+
+    -- Increment the next value by the step
+    self._nextValue += self._step
+
+    -- Return the next value
+    return nextValue
+end
+
+function Range:__iter()
+    -- 'self' will be passed into self._next iteratively
+    return self._next, self
 end
 
 return Range
